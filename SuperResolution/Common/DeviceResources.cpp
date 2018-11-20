@@ -111,8 +111,8 @@ void DX::DeviceResources::CreateDeviceResources()
 	com_ptr<IDXGIAdapter1> adapter;
 	GetHardwareAdapter(adapter.put());
 
-	// Create the Direct3D 12 API device object
-	HRESULT hr = D3D12CreateDevice(
+	HRESULT hr = D3D12CreateDevice(	// Create the Direct3D 12 API device object
+
 		adapter.get(),					// The hardware adapter.
 		D3D_FEATURE_LEVEL_11_0,			// Minimum feature level this app can support.
 		IID_PPV_ARGS(m_d3dDevice.put())		// Returns the Direct3D device created.

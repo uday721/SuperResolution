@@ -369,36 +369,37 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 // Saves the current state of the renderer.
 void Sample3DSceneRenderer::SaveState()
 {
-	auto state = ApplicationData::Current().LocalSettings().Values;
+	auto state = ApplicationData::Current().LocalSettings().Values();
 
-	if (state->HasKey(AngleKey))
+	if (state.HasKey(AngleKey))
 	{
-		state->Remove(AngleKey);
+		state.Remove(AngleKey);
 	}
-	if (state->HasKey(TrackingKey))
+	if (state.HasKey(TrackingKey))
 	{
-		state->Remove(TrackingKey);
+		state.Remove(TrackingKey);
 	}
 
-	state->Insert(AngleKey, PropertyValue::CreateSingle(m_angle));
-	state->Insert(TrackingKey, PropertyValue::CreateBoolean(m_tracking));
+	state.Insert(AngleKey, PropertyValue::CreateSingle(m_angle));
+	state.Insert(TrackingKey, PropertyValue::CreateBoolean(m_tracking));
 }
 
 // Restores the previous state of the renderer.
 void Sample3DSceneRenderer::LoadState()
 {
-	auto state = ApplicationData::Current().LocalSettings().Values;
-	if (state->HasKey(AngleKey))
-	{
-		m_angle = safe_cast<IPropertyValue^>(state->Lookup(AngleKey))->GetSingle();
-		state->Remove(AngleKey);
-		 
-	}
-	if (state->HasKey(TrackingKey))
-	{
-		m_tracking = safe_cast<IPropertyValue^>(state->Lookup(TrackingKey))->GetBoolean();
-		state->Remove(TrackingKey);
-	}
+	auto state = ApplicationData::Current().LocalSettings().Values();
+	//ApplicationData::Current()
+	//if (state.HasKey(AngleKey))
+	//{
+	//	m_angle = safe_cast<IPropertyValue>(state.Lookup(AngleKey));
+	//	state.Remove(AngleKey);
+	//	 
+	//}
+	//if (state.HasKey(TrackingKey))
+	//{
+	//	m_tracking = safe_cast<IPropertyValue^>(state->Lookup(TrackingKey))->GetBoolean();
+	//	state.Remove(TrackingKey);
+	//}
 }
 
 // Rotate the 3D cube model a set amount of radians.

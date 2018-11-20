@@ -20,6 +20,7 @@
 #include <winrt/Windows.Graphics.h>
 #include <winrt/Windows.Graphics.Display.h>
 #include <winrt/Windows.UI.Xaml.h>
+#include <winrt/Windows.Graphics.Display.Core.h>
 
 
 #if defined(_DEBUG)

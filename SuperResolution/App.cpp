@@ -15,11 +15,12 @@ using namespace Windows::System;
 using namespace Windows::Foundation;
 using namespace Windows::Graphics::Display;
 
-using Microsoft::WRL::ComPtr;
+//using Microsoft::WRL::ComPtr;
 
 // The DirectX 12 Application template is documented at https://go.microsoft.com/fwlink/?LinkID=613670&clcid=0x409
 
 // The main function is only used to initialize our IFrameworkView class.
+
 [Platform::MTAThread]
 int main(Platform::Array<Platform::String^>^)
 {
@@ -40,7 +41,7 @@ App::App() :
 }
 
 // The first method called when the IFrameworkView is being created.
-void App::Initialize(CoreApplicationView^ applicationView)
+void App::Initialize(CoreApplicationView const& applicationView)
 {
 	// Register event handlers for app lifecycle. This example includes Activated, so that we
 	// can make the CoreWindow active and start rendering on the window.
@@ -52,12 +53,13 @@ void App::Initialize(CoreApplicationView^ applicationView)
 
 	CoreApplication::Resuming +=
 		ref new EventHandler<Platform::Object^>(this, &App::OnResuming);
+
 }
 
 // Called when the CoreWindow object is created (or re-created).
-void App::SetWindow(CoreWindow^ window)
+void App::SetWindow(CoreWindow const& window)
 {
-	window->SizeChanged += 
+	window.SizeChanged += 
 		ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^>(this, &App::OnWindowSizeChanged);
 
 	window->VisibilityChanged +=
@@ -79,7 +81,7 @@ void App::SetWindow(CoreWindow^ window)
 }
 
 // Initializes scene resources, or loads a previously saved app state.
-void App::Load(Platform::String^ entryPoint)
+void App::Load(winrt::hstring const& entryPoint)
 {
 	if (m_main == nullptr)
 	{
@@ -94,8 +96,7 @@ void App::Run()
 	{
 		if (m_windowVisible)
 		{
-			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
-
+			CoreWindow::GetForCurrentThread().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
 			auto commandQueue = GetDeviceResources()->GetCommandQueue();
 			PIXBeginEvent(commandQueue, 0, L"Update");
 			{
@@ -114,7 +115,8 @@ void App::Run()
 		}
 		else
 		{
-			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessOneAndAllPending);
+			CoreWindow::GetForCurrentThread().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessOneAndAllPending);
+			
 		}
 	}
 }
@@ -128,73 +130,80 @@ void App::Uninitialize()
 
 // Application lifecycle event handlers.
 
-void App::OnActivated(CoreApplicationView^ applicationView, IActivatedEventArgs^ args)
+void App::OnActivated(CoreApplicationView const& applicationView, IActivatedEventArgs const& args)
 {
 	// Run() won't start until the CoreWindow is activated.
-	CoreWindow::GetForCurrentThread()->Activate();
+	CoreWindow::GetForCurrentThread().Activate();
 }
 
-void App::OnSuspending(Platform::Object^ sender, SuspendingEventArgs^ args)
+void App::OnSuspending(IInspectable const& sender, SuspendingEventArgs const& args)
 {
 	// Save app state asynchronously after requesting a deferral. Holding a deferral
 	// indicates that the application is busy performing suspending operations. Be
 	// aware that a deferral may not be held indefinitely. After about five seconds,
 	// the app will be forced to exit.
-	SuspendingDeferral^ deferral = args->SuspendingOperation->GetDeferral();
+	SuspendingDeferral deferral = args.SuspendingOperation().GetDeferral;
+	
 
 	create_task([this, deferral]()
 	{
 		m_main->OnSuspending();
-		deferral->Complete();
+		deferral.Complete();
 	});
 }
 
-void App::OnResuming(Platform::Object^ sender, Platform::Object^ args)
+void App::OnResuming(IInspectable const& sender, IInspectable const& args)
 {
 	// Restore any data or state that was unloaded on suspend. By default, data
 	// and state are persisted when resuming from suspend. Note that this event
 	// does not occur if the app was previously terminated.
-
 	m_main->OnResuming();
 }
 
 // Window event handlers.
 
-void App::OnWindowSizeChanged(CoreWindow^ sender, WindowSizeChangedEventArgs^ args)
+void App::OnWindowSizeChanged(CoreWindow const& sender, WindowSizeChangedEventArgs const& args)
 {
-	GetDeviceResources()->SetLogicalSize(Size(sender->Bounds.Width, sender->Bounds.Height));
+	
+	GetDeviceResources()->SetLogicalSize(Size(sender.Bounds().Width, sender.Bounds().Height));
 	m_main->OnWindowSizeChanged();
+	
 }
 
-void App::OnVisibilityChanged(CoreWindow^ sender, VisibilityChangedEventArgs^ args)
+void App::OnVisibilityChanged(CoreWindow  const& sender, VisibilityChangedEventArgs const& args)
 {
-	m_windowVisible = args->Visible;
+	m_windowVisible = args.Visible;
 }
 
-void App::OnWindowClosed(CoreWindow^ sender, CoreWindowEventArgs^ args)
+void App::OnWindowClosed(CoreWindow const& sender, CoreWindowEventArgs const& args)
 {
 	m_windowClosed = true;
+	
 }
 
+  
 // DisplayInformation event handlers.
 
-void App::OnDpiChanged(DisplayInformation^ sender, Object^ args)
+void App::OnDpiChanged(DisplayInformation const& sender, IInspectable const & args)
 {
 	// Note: The value for LogicalDpi retrieved here may not match the effective DPI of the app
 	// if it is being scaled for high resolution devices. Once the DPI is set on DeviceResources,
 	// you should always retrieve it using the GetDpi method.
 	// See DeviceResources.cpp for more details.
-	GetDeviceResources()->SetDpi(sender->LogicalDpi);
+
+	//GetDeviceResources();
 	m_main->OnWindowSizeChanged();
 }
 
-void App::OnOrientationChanged(DisplayInformation^ sender, Object^ args)
+void App::OnOrientationChanged(DisplayInformation const& sender, IInspectable const & args)
 {
-	GetDeviceResources()->SetCurrentOrientation(sender->CurrentOrientation);
+	
+	GetDeviceResources()->SetCurrentOrientation(sender.CurrentOrientation);
 	m_main->OnWindowSizeChanged();
+	
 }
 
-void App::OnDisplayContentsInvalidated(DisplayInformation^ sender, Object^ args)
+void App::OnDisplayContentsInvalidated(DisplayInformation const& sender, IInspectable const & args)
 {
 	GetDeviceResources()->ValidateDevice();
 }

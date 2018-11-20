@@ -38,6 +38,7 @@ void SuperResolutionMain::Update()
 	{
 		// TODO: Replace this with your app's content update functions.
 		m_sceneRenderer->Update(m_timer);
+		
 	});
 }
 
